@@ -59,7 +59,6 @@ sub add_fact {
     $req->header( 'Accept' => 'application/json' );
     $req->header( 'X-RJF-Apikey' => 'c25ff106-e7e2-4d82-86b0-e7b530881617' );
     my $res = $browser->request($req);
-    #$res->content;
 }
 
 sub sig_public {
@@ -67,7 +66,6 @@ sub sig_public {
     return if $nick eq $server->{nick};
 
     $msg =~ s/[\000-\037]//g;
-    $msg = lc($msg);
     chomp($msg);
     my $win = $server->channel_find($target);
     my $fact;
