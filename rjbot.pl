@@ -52,7 +52,14 @@ sub sig_public {
 
     elsif($msg =~ /!rjfact add (.+)$/) {
         # RUN sub to add new fact
-        $fact = "I would be adding the following fact if this method were implemented: $1";
+        $fact = add_fact($1);
+        if($fact->code != 201) {
+            $fact = "Unable to create fact.";
+        }
+        else {
+            my $json = decode_json($fact->content);
+            $fact = "Created new Fact with id: " . $json->{'id'};
+        }
     }
 
     elsif($msg =~ /!rjfact remove (\d+)$/) {
@@ -78,6 +85,31 @@ sub get_random {
     my $browser = LWP::UserAgent->new;
     my $res = $browser->get($url,@custom_headers);
 
+}
+
+sub add_fact {
+    my $fact = shift;
+    my %foo = (
+        class => "com.toastcoders.rjfacts.Fact",
+        createdBy => {
+            class => "User",
+            id => 1,
+        },
+        factoid => $fact,
+    );
+
+    my $json_text;                                                                                                                         $json_text = encode_json(\%foo);
+
+    my $url = "http://tomcat-demo.mrice.me/api/fact";
+    my $browser = LWP::UserAgent->new;
+    my $req = HTTP::Request->new(POST => $url);
+    $req->content_type('application/json');
+    $req->content($json_text);
+    $req->header( 'Content-Type' => 'application/json' );
+    $req->header( 'Accept' => 'application/json' );
+    $req->header( 'X-RJF-Apikey' => 'c25ff106-e7e2-4d82-86b0-e7b530881617' );
+    my $res = $browser->request($req);
+    #$res->content;
 }
 
 Irssi::signal_add_last('message public', 'sig_public');
