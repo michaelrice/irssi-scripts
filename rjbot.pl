@@ -24,6 +24,43 @@ $VERSION = '0.9';
     orignal_date  => 'Jan. 28th 2014'
 );
 
+sub get_random {
+    my @custom_headers = (
+        'User-Agent' => 'rjbot 5000',
+        'Accept' => 'application/json',
+        'X-RJF-Apikey' => 'c25ff106-e7e2-4d82-86b0-e7b530881617'
+    );
+    my $url = "http://tomcat-demo.mrice.me/api/fact";
+    my $browser = LWP::UserAgent->new;
+    my $res = $browser->get($url,@custom_headers);
+
+}
+
+sub add_fact {
+    my $fact = shift;
+    my %foo = (
+        class => "com.toastcoders.rjfacts.Fact",
+        createdBy => {
+            class => "User",
+            id => 1,
+        },
+        factoid => $fact,
+    );
+
+    my $json_text;                                                                                                                         $json_text = encode_json(\%foo);
+
+    my $url = "http://tomcat-demo.mrice.me/api/fact";
+    my $browser = LWP::UserAgent->new;
+    my $req = HTTP::Request->new(POST => $url);
+    $req->content_type('application/json');
+    $req->content($json_text);
+    $req->header( 'Content-Type' => 'application/json' );
+    $req->header( 'Accept' => 'application/json' );
+    $req->header( 'X-RJF-Apikey' => 'c25ff106-e7e2-4d82-86b0-e7b530881617' );
+    my $res = $browser->request($req);
+    #$res->content;
+}
+
 sub sig_public {
     my ($server, $msg, $nick, $address, $target) = @_;
     return if $nick eq $server->{nick};
@@ -73,43 +110,6 @@ sub sig_public {
 
     return unless $fact;
     $win->command("/ ". $fact);
-}
-
-sub get_random {
-    my @custom_headers = (
-        'User-Agent' => 'rjbot 5000',
-        'Accept' => 'application/json',
-        'X-RJF-Apikey' => 'c25ff106-e7e2-4d82-86b0-e7b530881617'
-    );
-    my $url = "http://tomcat-demo.mrice.me/api/fact";
-    my $browser = LWP::UserAgent->new;
-    my $res = $browser->get($url,@custom_headers);
-
-}
-
-sub add_fact {
-    my $fact = shift;
-    my %foo = (
-        class => "com.toastcoders.rjfacts.Fact",
-        createdBy => {
-            class => "User",
-            id => 1,
-        },
-        factoid => $fact,
-    );
-
-    my $json_text;                                                                                                                         $json_text = encode_json(\%foo);
-
-    my $url = "http://tomcat-demo.mrice.me/api/fact";
-    my $browser = LWP::UserAgent->new;
-    my $req = HTTP::Request->new(POST => $url);
-    $req->content_type('application/json');
-    $req->content($json_text);
-    $req->header( 'Content-Type' => 'application/json' );
-    $req->header( 'Accept' => 'application/json' );
-    $req->header( 'X-RJF-Apikey' => 'c25ff106-e7e2-4d82-86b0-e7b530881617' );
-    my $res = $browser->request($req);
-    #$res->content;
 }
 
 Irssi::signal_add_last('message public', 'sig_public');
