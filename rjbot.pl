@@ -61,6 +61,18 @@ sub add_fact {
     my $res = $browser->request($req);
 }
 
+sub get_specific {
+    my $factid = shift;
+    my @custom_headers = (
+        'User-Agent' => 'rjbot 5000',
+        'Accept' => 'application/json',
+        'X-RJF-Apikey' => 'c25ff106-e7e2-4d82-86b0-e7b530881617'
+    );
+    my $url = "http://tomcat-demo.mrice.me/api/fact/$factid";
+    my $browser = LWP::UserAgent->new;
+    my $res = $browser->get($url,@custom_headers);
+}
+
 sub sig_public {
     my ($server, $msg, $nick, $address, $target) = @_;
     return if $nick eq $server->{nick};
@@ -83,7 +95,14 @@ sub sig_public {
 
     elsif($msg =~ /!rjfact (\d+)$/) {
         #RUN sub to get specific rjfact 
-        $fact = "I would get info about $1, pull requests welcome!";
+        $fact = get_specific($1);
+        if($fact->code != 200) {
+            $fact = "Unable to find fact matching id: $1";
+        }
+        else {
+            my $json = decode_json($fact->content);
+            $fact = $json->{'factoid'};
+        }
     }
 
     elsif($msg =~ /!rjfact add (.+)$/) {
