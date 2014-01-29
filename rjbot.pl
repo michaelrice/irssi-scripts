@@ -47,7 +47,8 @@ sub add_fact {
         factoid => $fact,
     );
 
-    my $json_text;                                                                                                                         $json_text = encode_json(\%foo);
+    my $json_text;
+    $json_text = encode_json(\%foo);
 
     my $url = "http://tomcat-demo.mrice.me/api/fact";
     my $browser = LWP::UserAgent->new;
